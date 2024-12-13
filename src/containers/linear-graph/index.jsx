@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import * as tf from "@tensorflow/tfjs";
-import { Button, Input } from "antd";
+import { Button, Input, Table } from "antd";
 
 export default function LinearGraph() {
   const [model, setModel] = useState();
   const [xaxios, setXAxios] = useState();
   const [result, setResult] = useState();
+  const [dataSource, setDataSource] = useState([]);
 
   const handleTrain = async () => {
     const model = tf.sequential();
@@ -13,18 +14,52 @@ export default function LinearGraph() {
 
     model.compile({ loss: "meanSquaredError", optimizer: "sgd" });
 
-    const xs = tf.tensor2d([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], [10, 1]);
-    const ys = tf.tensor2d([1, 2, 5, 10, 17, 26, 37, 50, 65, 82], [10, 1]);
+    const xs = tf.tensor2d([-1, 0, 1, 2, 3, 4], [6, 1]);
+    const ys = tf.tensor2d([-3, -1, 1, 3, 5, 7], [6, 1]);
 
-    await model.fit(xs, ys, { epochs: 1000 });
+    await model.fit(xs, ys, { epochs: 250 });
     console.log("model ---", model);
     setModel(model);
   };
 
   const handlePredict = () => {
-    const predict = model.predict(tf.tensor2d([9], [1, 1])).dataSync();
+    const predict = model
+      .predict(tf.tensor2d([Number(xaxios)], [1, 1]))
+      .dataSync();
     setResult(predict);
+    dataSource.push({
+      input: xaxios,
+      output: predict[0],
+      actual: 2 * xaxios + 1,
+      diff: 2 * xaxios + 1 - predict[0],
+    });
+    setDataSource([...dataSource]);
   };
+
+  const columns = [
+    {
+      title: "Input",
+      dataIndex: "input",
+      key: "input",
+    },
+    {
+      title: "Output",
+      dataIndex: "output",
+      key: "output",
+    },
+    {
+      title: "Actual",
+      dataIndex: "actual",
+      key: "actual",
+    },
+    {
+      title: "Diff",
+      dataIndex: "diff",
+      key: "diff",
+    },
+  ];
+
+  console.log("dataousrce ---", dataSource);
 
   return (
     <div className="h-full w-full p-4">
@@ -43,6 +78,7 @@ export default function LinearGraph() {
         <div>
           <label>Result: {result}</label>
         </div>
+        <Table columns={columns} dataSource={dataSource} />
       </div>
     </div>
   );

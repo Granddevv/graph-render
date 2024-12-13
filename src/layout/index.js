@@ -2,6 +2,7 @@ import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { Header } from "../components";
 import Landing from "../containers/landing";
+import LinearGraph from "../containers/linear-graph";
 
 export default function MainLayout() {
   const router = createBrowserRouter([
@@ -19,7 +20,7 @@ export default function MainLayout() {
       element: (
         <div>
           <Header />
-          <Landing />
+          <LinearGraph />
         </div>
       ),
     },
